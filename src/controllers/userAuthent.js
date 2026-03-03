@@ -44,6 +44,6 @@ const login = async (req, res) => {
     res.cookie("token", token, { maxAge: 60 * 60 * 1000 });
     res.status(200).send("Logged In Successfully");
   } catch (error) {
-    res.status(401).send("Error: " + error);
+    res.send("Error: " + error);
   }
 };
