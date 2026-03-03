@@ -1,3 +1,4 @@
+const redisClient = require("../config/redis");
 const User = require("../models/user");
 const validate = require("../utils/validator");
 const bcrypt = require("bcrypt");
@@ -47,3 +48,45 @@ const login = async (req, res) => {
     res.send("Error: " + error);
   }
 };
+
+const logout = async (req, res) => {
+  try {
+    // cookies ko redis m add kr dunga
+    const { token } = req.cookies;
+    const payload = jwt.decode(token);
+
+    await redisClient.set(`token:${token}`, "Blocked");
+    await redisClient.expireAt(`token:${token}`, payload.exp);
+
+    // cookies clear kr dunga
+    res.cookie("token", null, { expires: new Date(Date.now()) });
+    res.send("Logged out Successfully");
+  } catch (error) {
+    res.status(503).send("Error : + " + error);
+  }
+};
+
+const adminRegister = async (req, res) => {
+  try {
+    // ist way to register the admin
+    // if (req.result.role != "admin") {
+    //   throw new Error("Invalid Creds");
+    // }
+    validate(req.body);
+    const { firstName, lastName, emailID } = req.body;
+    req.body.password = await bcrypt.hash(password, 10);
+
+    const user = await User.create(req.body);
+    const token = jwt.sign(
+      { _id: user_id, emailID: emailID, role: user.role },
+      process.env.JWT_KEY,
+      { expiresIn: 60 * 60 },
+    );
+    res.cookie("token", token, { maxAge: 60 * 60 * 1000 });
+    res.status(201).send("User Registered Successfully");
+  } catch (error) {
+    res.status(400).send("Error: + " + error);
+  }
+};
+
+module.exports = { register, login, logout, adminRegister };
