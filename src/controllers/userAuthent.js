@@ -25,6 +25,29 @@ const register = async (req, res) => {
   }
 };
 
+const adminRegister = async (req, res) => {
+  try {
+    // ist way to register the admin
+    // if (req.result.role != "admin") {
+    //   throw new Error("Invalid Creds");
+    // }
+    validate(req.body);
+    const { firstName, lastName, emailID } = req.body;
+    req.body.password = await bcrypt.hash(password, 10);
+
+    const user = await User.create(req.body);
+    const token = jwt.sign(
+      { _id: user._id, emailID: emailID, role: user.role },
+      process.env.JWT_KEY,
+      { expiresIn: 60 * 60 },
+    );
+    res.cookie("token", token, { maxAge: 60 * 60 * 1000 });
+    res.status(201).send("User Registered Successfully");
+  } catch (error) {
+    res.status(400).send("Error: + " + error);
+  }
+};
+
 const login = async (req, res) => {
   try {
     const { emailID, password } = req.body;
@@ -32,7 +55,7 @@ const login = async (req, res) => {
     if (!password) throw new Error("Invalid Creds");
 
     const user = await User.findOne({ emailID });
-    const match = bcrypt.compare(password, user.password);
+    const match = await bcrypt.compare(password, user.password);
 
     if (!match) throw new Error("Invalid Creds");
 
@@ -63,29 +86,6 @@ const logout = async (req, res) => {
     res.send("Logged out Successfully");
   } catch (error) {
     res.status(503).send("Error : + " + error);
-  }
-};
-
-const adminRegister = async (req, res) => {
-  try {
-    // ist way to register the admin
-    // if (req.result.role != "admin") {
-    //   throw new Error("Invalid Creds");
-    // }
-    validate(req.body);
-    const { firstName, lastName, emailID } = req.body;
-    req.body.password = await bcrypt.hash(password, 10);
-
-    const user = await User.create(req.body);
-    const token = jwt.sign(
-      { _id: user_id, emailID: emailID, role: user.role },
-      process.env.JWT_KEY,
-      { expiresIn: 60 * 60 },
-    );
-    res.cookie("token", token, { maxAge: 60 * 60 * 1000 });
-    res.status(201).send("User Registered Successfully");
-  } catch (error) {
-    res.status(400).send("Error: + " + error);
   }
 };
 

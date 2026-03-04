@@ -5,11 +5,11 @@ const redisClient = require("../config/redis");
 const adminMiddleware = async (req, res, next) => {
   try {
     const { token } = req.cookies;
-    if (!token) throw new Error("Invalid token");
+    if (!token) throw new Error("Token is not present");
     const payload = jwt.verify(token, process.env.JWT_KEY);
 
     const { _id } = payload;
-    if (_id) {
+    if (!_id) {
       throw new Error("Invalid Token");
     }
 

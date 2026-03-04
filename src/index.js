@@ -5,18 +5,15 @@ const app = express();
 const cookieParser = require("cookie-parser");
 const main = require("./config/db");
 const redisClient = require("./config/redis");
+const authRouter = require("./routes/userAuth");
 app.use(express.json());
 app.use(cookieParser());
 
-// main()
-//   .then(async () => {
-//     app.listen(process.env.PORT, () => {
-//       console.log("Server listening at port number: " + process.env.PORT);
-//     });
-//   })
-//   .catch((err) => console.log("Error Occurred: " + err));
+app.get("/", (req, res) => {
+  res.send("Hello world");
+});
 
-// New Connection
+app.use("/user", authRouter);
 const IntializeConnection = async () => {
   try {
     await Promise.all([main(), redisClient.connect()]);
