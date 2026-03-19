@@ -20,7 +20,7 @@ const createProblem = async (req, res) => {
   } = req.body;
 
   try {
-    for (const { language, completedCode } of referenceSolution) {
+    for (const { language, completeCode } of referenceSolution) {
       const languageId = getLanguageById(language);
 
       const submissions = visibleTestCases.map((testcase) => ({
@@ -36,6 +36,7 @@ const createProblem = async (req, res) => {
 
       const testResult = await submitToken(resultToken);
 
+      console.log(testResult);
       for (const test of testResult) {
         if (test.status_id != 3) {
           return res.status(400).send("Error Occured");
@@ -92,6 +93,8 @@ const updateProblem = async (req, res) => {
 
       const resultToken = submitResult.map((value) => value.token);
 
+      const testResult = await submitToken(resultToken);
+
       for (const test of testResult) {
         if (test.status_id != 3) {
           return res.status(400).send("Error Occured");
@@ -104,6 +107,7 @@ const updateProblem = async (req, res) => {
       { ...req.body },
       { runValidators: true, new: true },
     );
+    res.status(200).send(newProblem);
   } catch (res) {
     res.status(500).send("Error: " + err);
   }
@@ -113,34 +117,67 @@ const deleteProblem = async (req, res) => {
   const { id } = req.params;
   try {
     if (!id) return res.status(400).send("ID is Missing");
+
+    const deletedProblem = await Problem.findByIdAndDelete(id);
+
+    if (!deletedProblem) return res.status(404).send("Problem is Missing");
+
     res.status(200).send("Successfully Deleted");
   } catch (err) {
     res.status(500).send("Error: " + err);
   }
 };
 
+// const getProblemByID = async (req, res) => {
+//   const { id } = req.params;
+//   try {
+//     if (!id) return res.status(400).send("ID is missing");
+//     const getProblem = await Problem.findById(id);
+//     if (!getProblem) res.status(400).send("Problem is not found. ");
+//   } catch (error) {
+//     res.status(500).send("Error Occurred.");
+//   }
+// };
 const getProblemByID = async (req, res) => {
   const { id } = req.params;
   try {
-    if (!id) return res.status(400).send("ID is missing");
-    const getProblem = await Problem.findById(id);
-    if (!getProblem) res.status(400).send("Problem is not found. ");
-  } catch (error) {
-    res.status(500).send("Error Occurred.");
-  }
-};
+    if (!id) return res.status(400).send("ID is Missing");
 
-const getAllProblems = async (req, res) => {
-  try {
-    const getProblem = await Problem.find({});
-    if (getProblem.length === 0)
-      return res.status(404).send("Problem is missing. ");
+    const getProblem = await Problem.findById(id).select(
+      "_id title description difficulty tags visibleTestCases startCode referenceSolution ",
+    );
+
+    if (!getProblem) return res.status(404).send("Problem is Missing");
+
     res.status(200).send(getProblem);
-  } catch (error) {
+  } catch (err) {
     res.status(500).send("Error: " + err);
   }
 };
+// const getAllProblems = async (req, res) => {
+//   try {
+//     const getProblem = await Problem.find({});
+//     if (getProblem.length === 0)
+//       return res.status(404).send("Problem is missing. ");
+//     res.status(200).send(getProblem);
+//   } catch (error) {
+//     res.status(500).send("Error: " + err);
+//   }
+// };
+const getAllProblems = async (req, res) => {
+  try {
+    const getProblem = await Problem.find({}).select(
+      "_id title difficulty tags",
+    );
 
+    if (getProblem.length == 0)
+      return res.status(404).send("Problem is Missing");
+
+    res.status(200).send(getProblem);
+  } catch (err) {
+    res.status(500).send("Error: " + err);
+  }
+};
 module.exports = {
   createProblem,
   updateProblem,

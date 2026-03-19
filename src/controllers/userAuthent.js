@@ -42,9 +42,9 @@ const adminRegister = async (req, res) => {
       { expiresIn: 60 * 60 },
     );
     res.cookie("token", token, { maxAge: 60 * 60 * 1000 });
-    res.status(201).send("User Registered Successfully");
+    res.status(201).send("Admin Registered Successfully");
   } catch (error) {
-    res.status(400).send("Error: + " + error);
+    res.status(400).send("Error in creating admin: + " + error);
   }
 };
 
