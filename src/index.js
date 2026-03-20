@@ -16,6 +16,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/user", authRouter);
+
 app.use("/problem", problemRouter);
 
 const IntializeConnection = async () => {
