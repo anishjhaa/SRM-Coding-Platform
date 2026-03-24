@@ -23,6 +23,11 @@ const submissionSchema = new Schema(
     },
     language: {
       type: String,
+      enum: ["javascript", "c++", "java"],
+      required: true,
+    },
+    status: {
+      type: String,
       enum: ["pending", "accepted", "wrong", "error"],
       default: "pending",
     },
@@ -51,3 +56,5 @@ const submissionSchema = new Schema(
     timestamps: true,
   },
 );
+const Submission = mongoose.model("submission", submissionSchema);
+module.exports = Submission;

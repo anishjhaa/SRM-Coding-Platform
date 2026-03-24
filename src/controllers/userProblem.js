@@ -29,7 +29,7 @@ const createProblem = async (req, res) => {
         stdin: testcase.input,
         expected_output: testcase.output,
       }));
-
+      console.log("Submission m yeh aa rha h ", submissions);
       const submitResult = await submitBatch(submissions);
 
       const resultToken = submitResult.map((value) => value.token);

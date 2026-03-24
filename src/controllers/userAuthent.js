@@ -32,12 +32,15 @@ const adminRegister = async (req, res) => {
     //   throw new Error("Invalid Creds");
     // }
     validate(req.body);
-    const { firstName, lastName, emailID } = req.body;
+    const { firstName, lastName, password } = req.body;
     req.body.password = await bcrypt.hash(password, 10);
 
+    req.body.role = "admin";
+
     const user = await User.create(req.body);
+    // user.role = "admin";
     const token = jwt.sign(
-      { _id: user._id, emailID: emailID, role: user.role },
+      { _id: user._id, emailID: user.emailID, role: user.role },
       process.env.JWT_KEY,
       { expiresIn: 60 * 60 },
     );
@@ -60,7 +63,7 @@ const login = async (req, res) => {
     if (!match) throw new Error("Invalid Creds");
 
     const token = jwt.sign(
-      { _id: user._id, emailID: emailID },
+      { _id: user._id, emailID: emailID, role: user.role },
       process.env.JWT_KEY,
       { expiresIn: 60 * 60 },
     );
@@ -68,7 +71,7 @@ const login = async (req, res) => {
     res.cookie("token", token, { maxAge: 60 * 60 * 1000 });
     res.status(200).send("Logged In Successfully");
   } catch (error) {
-    res.send("Error: " + error);
+    res.status(401).send("Error: " + error);
   }
 };
 

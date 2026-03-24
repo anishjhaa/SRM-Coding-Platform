@@ -12,6 +12,7 @@ const userMiddleware = require("../middleware/userMiddleware");
 authRouter.post("/register", register);
 authRouter.post("/login", login);
 authRouter.post("/logout", userMiddleware, logout);
-authRouter.post("/admin/register", adminMiddleware, adminRegister);
+// authRouter.post("/admin/register", adminMiddleware, adminRegister);
+authRouter.post("/admin/register", adminRegister);
 
 module.exports = authRouter;

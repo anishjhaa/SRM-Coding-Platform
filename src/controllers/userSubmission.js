@@ -38,6 +38,10 @@ const submitCode = async (req, res) => {
 
     const submitResult = await submitBatch(submissions);
 
+    if (!submitResult || !Array.isArray(submitResult)) {
+      throw new Error("Invalid API Response");
+    }
+
     const resultToken = submitResult.map((value) => value.token);
 
     const testResult = await submitToken(resultToken);
