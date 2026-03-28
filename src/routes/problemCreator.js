@@ -8,6 +8,8 @@ const {
   deleteProblem,
   getProblemByID,
   getAllProblems,
+  solvedAllProblembyUser,
+  submittedProblem,
 } = require("../controllers/userProblem");
 const userMiddleware = require("../middleware/userMiddleware");
 
@@ -31,5 +33,12 @@ problemRouter.get("/getAllProblem", userMiddleware, getAllProblems);
 //   userMiddleware,
 //   solvedAllProblembyUser,
 // );
+problemRouter.get(
+  "/problemSolvedByUser",
+  userMiddleware,
+  solvedAllProblembyUser,
+);
+
+problemRouter.get("submittedProblem/:pid", userMiddleware, submittedProblem);
 
 module.exports = problemRouter;

@@ -7,17 +7,19 @@ const main = require("./config/db");
 const redisClient = require("./config/redis");
 const authRouter = require("./routes/userAuth");
 const problemRouter = require("./routes/problemCreator");
-
+const submitRouter = require("./routes/submit");
 app.use(express.json());
 app.use(cookieParser());
-
-app.get("/", (req, res) => {
-  res.send("Hello world");
-});
 
 app.use("/user", authRouter);
 
 app.use("/problem", problemRouter);
+
+app.use("/submission", submitRouter);
+
+app.get("/", (req, res) => {
+  res.send("Hello world");
+});
 
 const IntializeConnection = async () => {
   try {

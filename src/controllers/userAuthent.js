@@ -3,20 +3,22 @@ const User = require("../models/user");
 const validate = require("../utils/validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const Submission = require("../models/submission");
 
 const register = async (req, res) => {
   try {
     // first need to validate the use
     validate(req.body);
-    const { emailID, password } = req.body;
+    const { firstName, emailID, password } = req.body;
     req.body.password = await bcrypt.hash(password, 10);
+    req.body.role = "user";
 
     // Token generate krna
     const user = await User.create(req.body);
     const token = jwt.sign(
-      { _id: user._id, emailID: emailID },
+      { _id: user._id, emailID: emailID, role: "user" },
       process.env.JWT_KEY,
-      { expiresIn: 60 * 60 },
+      { expiresIn: 60 * 60 * 1000 },
     );
     res.cookie("token", token, { maxAge: 60 * 60 * 1000 });
     res.status(201).send("User Registered Successfully");
@@ -89,6 +91,18 @@ const logout = async (req, res) => {
     res.send("Logged out Successfully");
   } catch (error) {
     res.status(503).send("Error : + " + error);
+  }
+};
+
+const deleteProfile = async (req, res) => {
+  try {
+    const userId = req.result._id;
+
+    await User.findByIdAndDelete(userId);
+
+    res.status(200).send("Deleted Successfully");
+  } catch (err) {
+    res.status(500).send("Internal Server Error");
   }
 };
 
