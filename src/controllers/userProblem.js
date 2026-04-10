@@ -125,7 +125,7 @@ const deleteProblem = async (req, res) => {
 
     res.status(200).send("Successfully Deleted");
   } catch (err) {
-    res.status(500).send("Error: " + err);
+    res.status(500).send(" user problem wala Error: " + err);
   }
 };
 
@@ -179,7 +179,6 @@ const getAllProblems = async (req, res) => {
     res.status(500).send("Error: " + err);
   }
 };
-
 const solvedAllProblembyUser = async (req, res) => {
   try {
     const userId = req.result._id;
