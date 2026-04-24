@@ -4,11 +4,12 @@ import { z } from "zod";
 import axiosClient from "../utils/axiosClient";
 import { useNavigate } from "react-router";
 
+// Zod schema matching the problem schema
 const problemSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
   difficulty: z.enum(["easy", "medium", "hard"]),
-  tags: z.enum(["array", "linkedlist", "graph", "dp"]),
+  tags: z.enum(["array", "linkedList", "graph", "dp"]),
   visibleTestCases: z
     .array(
       z.object({
@@ -73,16 +74,25 @@ function AdminPanel() {
     remove: removeVisible,
   } = useFieldArray({
     control,
+    name: "visibleTestCases",
+  });
+
+  const {
+    fields: hiddenFields,
+    append: appendHidden,
+    remove: removeHidden,
+  } = useFieldArray({
+    control,
     name: "hiddenTestCases",
   });
 
   const onSubmit = async (data) => {
     try {
       await axiosClient.post("/problem/create", data);
-      alert("Problem created successfully");
+      alert("Problem created successfully!");
       navigate("/");
     } catch (error) {
-      alert(`Error:${error.response?.data?.message || error.message}`);
+      alert(`Error: ${error.response?.data?.message || error.message}`);
     }
   };
 
